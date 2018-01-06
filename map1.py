@@ -19,14 +19,20 @@ def color_producer(elevation):
 
 mapa = folium.Map(location=[38.58,-99.09],zoom_start=6,tiles="Mapbox Bright") # Wiadomo potrzebujemy mapę na której rozmieścimy nasze markery
 
-fg = folium.FeatureGroup(name="My Map") # NIE DO KOŃCA JASNE
+fgv = folium.FeatureGroup(name="Volcanoes") # Opis można znaleźć  dzięki help(folium.FeatureGroup), ta metoda tworzy pojedynczy layer(warstwe), możemy "wkładać" do niego rózne rzeczy a to zrozumie je jako jedna warstwa
 
 
 for lt, ln, el in zip(lat, lon, ele):  # Ta pętla dodaje lt i ln i el przy użyciu funkcji "zip" (należy wiedzieć jak działa(po jednaym z każdej listy po kolei)) do danej "location" a następnie tworzy marker w podanych współrzędnych
-    fg.add_child(folium.CircleMarker(location=[lt, ln], radius=6, popup=folium.Popup(str(el)+" m",parse_html=True), fill_color=color_producer(el), color="grey", fill=True, fill_opacity=0.7)) # Przy popup występuje trudna "komenda", która zapobiega możliwości problemu ze stroną, jeżeli jej nie zapamiętam zwyczajnie użyć el(str)
+    fgv.add_child(folium.CircleMarker(location=[lt, ln], radius=6, popup=folium.Popup(str(el)+" m",parse_html=True), fill_color=color_producer(el), color="grey", fill=True, fill_opacity=0.7)) # Przy popup występuje trudna "komenda", która zapobiega możliwości problemu ze stroną, jeżeli jej nie zapamiętam zwyczajnie użyć el(str)
+
+fgp = folium.FeatureGroup(name="Population")
+
+fgp.add_child(folium.GeoJson(data=open("world.json", "r", encoding="utf-8-sig").read(), style_function=lambda x: {"fillColor":"green" if x["properties"]["POP2005"] < 10000000 else "orange" if 10000000 <= x["properties"]["POP2005"] < 20000000 else "red"})) # Dodanie pliku json, trzeba dodawac część encoding
 
 
-mapa.add_child(fg) # NIE JASNE
 
 
+mapa.add_child(fgv)
+mapa.add_child(fgp) # NIE JASNE
+mapa.add_child(folium.LayerControl())
 mapa.save("Map1.html") # ZAWSZE NALEŻY MAPĘ ZAPISAĆ
